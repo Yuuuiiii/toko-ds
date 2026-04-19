@@ -1,55 +1,101 @@
-<?php
-// Cek session kasir
-// session_start();
-// if (!isset($_SESSION['user']) || $_SESSION['user']['Peran'] !== 'Kasir') {
-//     header('Location: /index.php');
-//     exit;
-// }
-$kasir_nama = "Nandika Aditia"; // nanti diganti dari $_SESSION
+<?php 
+// 1. Panggil Header (Otomatis memuat tag HTML, CSS, dan Bar Navigasi Atas)
+require_once '../../includes/header_kasir.php'; 
 ?>
-<!DOCTYPE html>
-<html lang="id" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kasir Terminal — Toko DS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/toko-ds/assets/css/kasir.css" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-</head>
-<body>
 
-<!-- TOP HEADER -->
-<header class="top-header">
-  <div class="header-left">
-    <span class="logo-text">TOKO<span class="logo-accent">DS</span></span>
-    <div class="divider-v"></div>
-    <div class="clock-wrap">
-      <i data-lucide="clock" class="icon-sm"></i>
-      <span id="live-clock">--:--:--</span>
-      <span id="live-date">---</span>
+<div class="col-left">
+    
+    <div class="search-bar-wrap">
+        <div class="search-input-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" class="search-input" placeholder="Cari Nama Barang atau Scan Barcode/QR...">
+        </div>
+        <button class="btn-scan">
+            <i data-lucide="scan-barcode"></i> Scan
+        </button>
     </div>
-  </div>
-  <div class="header-right">
-    <div class="shift-info">
-      <span class="shift-label">SHIFT AKTIF</span>
-      <span class="shift-time" id="shift-start">--:--</span>
+
+    <div class="table-card">
+        <div class="table-header-row">
+            <span>#</span>
+            <span>Produk</span>
+            <span>Qty</span>
+            <span>Harga</span>
+            <span>Subtotal</span>
+            <span></span>
+        </div>
+        
+        <div class="table-body">
+            <div class="table-row">
+                <span class="row-num">1</span>
+                <div>
+                    <div class="row-product-name">Minyak Goreng Bimoli 2L</div>
+                    <div class="row-product-sku">SKU: 89999881234</div>
+                </div>
+                <input type="number" class="qty-input" value="1" min="1">
+                <span class="row-price">Rp 35.000</span>
+                <span class="row-subtotal">Rp 35.000</span>
+                <button class="btn-delete" title="Hapus item">
+                    <i data-lucide="trash-2" class="icon-sm"></i>
+                </button>
+            </div>
+            
+            </div>
+
+        <div class="table-footer">
+            <div class="item-count">Total item: <span>1</span></div>
+            <button class="btn-clear">
+                <i data-lucide="trash"></i> Kosongkan
+            </button>
+        </div>
     </div>
-    <div class="divider-v"></div>
-    <div class="kasir-info">
-      <div class="kasir-avatar"><?= strtoupper(substr($kasir_nama, 0, 1)) ?></div>
-      <div class="kasir-meta">
-        <span class="kasir-role">Kasir</span>
-        <span class="kasir-name"><?= htmlspecialchars($kasir_nama) ?></span>
-      </div>
+</div>
+
+<div class="col-right">
+    <div class="payment-panel">
+        
+        <div class="total-section">
+            <div class="total-label">TOTAL TAGIHAN</div>
+            <div class="total-amount">Rp 35.000</div>
+        </div>
+
+        <div class="method-section">
+            <div class="method-label">METODE PEMBAYARAN</div>
+            <div class="method-toggle">
+                <button class="method-btn active">
+                    <i data-lucide="banknote"></i>
+                    TUNAI
+                </button>
+                <button class="method-btn">
+                    <i data-lucide="qr-code"></i>
+                    QRIS
+                </button>
+                <button class="method-btn">
+                    <i data-lucide="credit-card"></i>
+                    DEBIT/EDC
+                </button>
+            </div>
+        </div>
+
+        <div class="payment-detail">
+            <div class="detail-input-wrap">
+                <span class="detail-input-label">Nominal Uang Diterima</span>
+                <input type="text" class="detail-input" placeholder="Contoh: 50000" value="50000">
+            </div>
+            
+            <div class="kembalian-box">
+                <span class="kembalian-label">Kembalian</span>
+                <span class="kembalian-amount">Rp 15.000</span>
+            </div>
+        </div>
+
+        <button class="btn-checkout">
+            SELESAIKAN TRANSAKSI
+        </button>
     </div>
-    <button class="btn-end-shift" onclick="confirmEndShift()">
-      <i data-lucide="log-out" class="icon-sm"></i>
-      Akhiri Shift
-    </button>
-    <button class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle tema">
-      <i data-lucide="sun" id="theme-icon"></i>
-    </button>
-  </div>
-</header>
+</div>
+
+<?php 
+// 2. Panggil Footer (Menutup struktur main, HTML, dan memuat script JS)
+require_once '../../includes/footer.php'; 
+?>
