@@ -1,0 +1,175 @@
+/* ============================================
+   TOKO DS — GLOBAL CSS
+   Shared styles: reset, variables, typography
+   Import ini di semua halaman sebelum css lainnya
+   ============================================ */
+
+/* ---- CSS VARIABLES (DARK default) ---- */
+:root {
+  --bg-base: #0f1117;
+  --bg-surface: #1a1d27;
+  --bg-elevated: #222635;
+  --bg-input: #2a2e40;
+  --border: #2e3248;
+  --border-subtle: #252840;
+
+  --text-primary: #eef0f8;
+  --text-secondary: #8b90a8;
+  --text-muted: #555a72;
+
+  --accent: #4f7bff;
+  --accent-hover: #3d68f0;
+  --accent-glow: rgba(79, 123, 255, 0.15);
+
+  --danger: #ff4d4d;
+  --danger-subtle: rgba(255, 77, 77, 0.1);
+  --success: #22c87a;
+  --success-subtle: rgba(34, 200, 122, 0.1);
+  --warning: #f0a500;
+  --warning-subtle: rgba(240, 165, 0, 0.1);
+  --info: #38bdf8;
+  --info-subtle: rgba(56, 189, 248, 0.1);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 4px 16px rgba(79, 123, 255, 0.3);
+}
+
+/* ---- LIGHT THEME ---- */
+[data-theme="light"] {
+  --bg-base: #f0f2f8;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8f9fc;
+  --bg-input: #eef0f6;
+  --border: #dde0ec;
+  --border-subtle: #e8eaf2;
+
+  --text-primary: #1a1d2e;
+  --text-secondary: #5a5f7a;
+  --text-muted: #9aa0bc;
+
+  --accent: #3d5fe0;
+  --accent-hover: #2d4fcf;
+  --accent-glow: rgba(61, 95, 224, 0.12);
+
+  --danger: #e03535;
+  --danger-subtle: rgba(224, 53, 53, 0.08);
+  --success: #1aab68;
+  --success-subtle: rgba(26, 171, 104, 0.08);
+  --warning: #d4900a;
+  --warning-subtle: rgba(212, 144, 10, 0.08);
+  --info: #0284c7;
+  --info-subtle: rgba(2, 132, 199, 0.08);
+
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-btn: 0 4px 16px rgba(61, 95, 224, 0.25);
+}
+
+/* ---- RESET ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+img { display: block; max-width: 100%; }
+ul, ol { list-style: none; }
+
+/* ---- TYPOGRAPHY ---- */
+.font-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+}
+.font-mono {
+  font-family: 'DM Mono', monospace;
+}
+
+/* ---- SHARED COMPONENTS ---- */
+
+/* Logo */
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+.logo-accent { color: var(--accent); }
+
+/* Divider vertikal */
+.divider-v {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+}
+
+/* Badge / pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.badge-tunai   { background: var(--success-subtle); color: var(--success); }
+.badge-qris    { background: var(--info-subtle);    color: var(--info); }
+.badge-debit   { background: var(--warning-subtle); color: var(--warning); }
+.badge-success { background: var(--success-subtle); color: var(--success); }
+.badge-danger  { background: var(--danger-subtle);  color: var(--danger); }
+.badge-neutral { background: var(--bg-elevated);    color: var(--text-secondary); }
+
+/* Avatar */
+.avatar {
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.avatar-md { width: 36px; height: 36px; font-size: 15px; }
+.avatar-sm { width: 30px; height: 30px; font-size: 13px; }
+
+/* Theme toggle button (shared) */
+.btn-theme {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-theme:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
