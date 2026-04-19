@@ -5,6 +5,13 @@
    ============================================ */
 
 /* ---- CSS VARIABLES (DARK default) ---- */
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
 :root {
   --bg-base: #0f1117;
   --bg-surface: #1a1d27;
@@ -75,7 +82,7 @@
 
 html, body {
   height: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
   line-height: 1.5;
   background: var(--bg-base);
@@ -93,18 +100,18 @@ ul, ol { list-style: none; }
 
 /* ---- TYPOGRAPHY ---- */
 .font-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 800;
 }
 .font-mono {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Inter', sans-serif;
 }
 
 /* ---- SHARED COMPONENTS ---- */
 
 /* Logo */
 .logo-text {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.5px;
@@ -141,7 +148,7 @@ ul, ol { list-style: none; }
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   display: flex;
   align-items: center;
