@@ -7,11 +7,11 @@ require_once '../../includes/header_kasir.php';
     
     <div class="search-bar-wrap">
         <div class="search-input-wrap">
-            <i data-lucide="search"></i>
-            <input type="text" class="search-input" placeholder="Cari Nama Barang atau Scan Barcode/QR...">
+            <i data-lucide="search" class="icon-search"></i>
+            <input type="text" class="search-input" placeholder="Ketik nama barang atau scan barcode...">
         </div>
-        <button class="btn-scan">
-            <i data-lucide="scan-barcode"></i> Scan
+        <button class="btn-action-search">
+            Cari
         </button>
     </div>
 

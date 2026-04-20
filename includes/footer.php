@@ -37,8 +37,15 @@
   }
 
   // 5. Placeholder Akhiri Shift
+// Fungsi Akhiri Shift & Logout
   function confirmEndShift() {
-      alert("Fase Blind Close (Tutup Shift Buta) akan dihubungkan ke Backend.");
+      // Validasi keamanan: cegah kasir tidak sengaja kepencet
+      const konfirmasi = confirm("YAKIN INGIN MENGAKHIRI SHIFT?\n\nPastikan uang laci sudah sesuai sebelum keluar dari sistem.");
+      
+      if (konfirmasi) {
+          // Arahkan ke file pemutus sesi
+          window.location.href = "<?= BASE_URL ?>/logout.php";
+      }
   }
 </script>
 

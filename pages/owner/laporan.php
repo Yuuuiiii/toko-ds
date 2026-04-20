@@ -86,10 +86,9 @@ require_once '../../includes/header_owner.php';
   <div class="table-section">
     <div class="table-section-header">
       <span class="table-section-title">Riwayat Transaksi</span>
-      <button class="btn-export" onclick="exportPDF()">
-        <i data-lucide="file-down"></i>
-        Export PDF
-      </button>
+        <button onclick="window.print()" style="background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;">
+            <i data-lucide="file-down" style="width: 18px; height: 18px;"></i> Export PDF
+        </button>
     </div>
     <table class="data-table">
       <thead>
