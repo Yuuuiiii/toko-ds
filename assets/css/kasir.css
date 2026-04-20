@@ -236,67 +236,66 @@ html, body {
 }
 
 /* Search & Scan bar */
+/* Container diset stretch agar anak-anaknya sama tinggi */
 .search-bar-wrap {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: stretch; 
 }
 
 .search-input-wrap {
-  flex: 1;
-  position: relative;
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
-.search-input-wrap i {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  width: 18px; height: 18px;
-}
-.search-input {
-  width: 100%;
-  padding: 12px 14px 12px 42px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-.search-input::placeholder { color: var(--text-muted); }
 
-.btn-scan {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 18px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+.search-input-wrap .icon-search,
+.search-input-wrap svg.icon-search {
+    position: absolute !important;
+    left: 16px !important;
+    color: var(--text-muted);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 10;
 }
-.btn-scan:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-glow);
+
+/* Kunci tinggi di 48px */
+.search-input {
+    width: 100%;
+    height: 48px; /* TINGGI ABSOLUT */
+    padding: 0 16px 0 48px !important; 
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
 }
-.btn-scan.scanning {
-  border-color: var(--success);
-  color: var(--success);
-  background: var(--success-subtle);
-  animation: pulse-border 1s ease-in-out infinite;
+
+.search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    outline: none;
+}
+
+/* Kunci tinggi tombol di 48px juga */
+.btn-action-search {
+    height: 48px; /* TINGGI ABSOLUT */
+    padding: 0 24px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-action-search:hover {
+    background: var(--accent-hover);
 }
 
 @keyframes pulse-border {
@@ -543,59 +542,72 @@ html, body {
   gap: 12px;
 }
 
+/* --- Area Uang Diterima --- */
 .detail-input-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.detail-input-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-.detail-input {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.detail-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-.detail-input::placeholder {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
+    margin-bottom: 16px;
 }
 
-/* Kembalian (Tunai only) */
+.detail-input-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-input {
+    width: 100%;
+    padding: 14px 16px;
+    /* Kontras ekstrem: gunakan background paling dasar yang berlawanan dengan surface */
+    background: var(--bg-base); 
+    border: 2px solid var(--border); /* Border lebih tebal */
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 20px; /* Angka uang harus masif */
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.detail-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+    outline: none;
+}
+
+.detail-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 16px;
+}
+
+/* --- Area Kembalian --- */
 .kembalian-box {
-  padding: 14px;
-  background: var(--success-subtle);
-  border: 1px solid var(--success);
-  border-radius: var(--radius-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    /* Memberikan "blok" visual tersendiri agar tidak menyatu dengan background */
+    background: rgba(34, 200, 122, 0.08); 
+    border: 1.5px solid var(--success);
+    border-radius: var(--radius-sm);
+    margin-bottom: 24px;
 }
+
 .kembalian-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--success);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--success);
+    text-transform: uppercase;
 }
+
 .kembalian-amount {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--success);
+    font-size: 24px; /* Hierarki tertinggi kedua setelah Total Tagihan */
+    font-weight: 800;
+    color: var(--success);
+    font-family: 'Inter', sans-serif;
 }
 
 /* QRIS placeholder */
@@ -615,30 +627,31 @@ html, body {
 
 /* Checkout button */
 .btn-checkout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 18px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow-btn);
+    width: 100%;
+    height: 64px; /* Tinggi masif */
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px; /* Teks lebih besar */
+    font-weight: 800; /* Teks lebih tebal */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); /* Efek elevasi */
 }
+
 .btn-checkout:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(79,123,255,0.4);
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(67, 97, 238, 0.4);
 }
-.btn-checkout:active { transform: translateY(0); }
+
+.btn-checkout:active {
+    transform: translateY(0);
+}
 .btn-checkout:disabled {
   background: var(--bg-elevated);
   color: var(--text-muted);

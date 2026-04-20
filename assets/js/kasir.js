@@ -1,16 +1,18 @@
+
+// FUNGSI UTILITAS (Hitung & Format)
+
 function formatRupiah(angka) {
     return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
 }
 
-// Fungsi membersihkan format Rupiah untuk kalkulasi (Rp 35.000 -> 35000)
 function parseRupiah(text) {
     return parseInt(text.replace(/[^0-9]/g, '')) || 0;
 }
 
-// Fungsi utama kalkulasi ulang seluruh tabel
 function hitungTotalTransaksi() {
     let grandTotal = 0;
-    const barisBarang = document.querySelectorAll('.table-row'); // Asumsi row pakai class .table-row
+    let totalItem = 0;
+    const barisBarang = document.querySelectorAll('.table-row');
 
     barisBarang.forEach(baris => {
         const inputQty = baris.querySelector('.qty-input');
@@ -22,34 +24,24 @@ function hitungTotalTransaksi() {
             const harga = parseRupiah(elmHarga.innerText);
             const subtotal = qty * harga;
 
-            // Update text subtotal di baris tersebut
             elmSubtotal.innerText = formatRupiah(subtotal);
             grandTotal += subtotal;
+            totalItem += 1;
         }
     });
 
-    // Update Grand Total di panel kanan
+    // Update panel kanan & footer
     const elmTotalMassive = document.querySelector('.total-amount');
-    if (elmTotalMassive) {
-        elmTotalMassive.innerText = formatRupiah(grandTotal);
-    }
+    if (elmTotalMassive) elmTotalMassive.innerText = formatRupiah(grandTotal);
     
-    // Trigger hitung kembalian jika metode tunai sedang aktif
+    const elmTotalItem = document.querySelector('.item-count span');
+    if (elmTotalItem) elmTotalItem.innerText = totalItem;
+
     hitungKembalian();
 }
 
-// Event Listener untuk semua input Qty
-document.addEventListener('input', function(e) {
-    if (e.target && e.target.classList.contains('qty-input')) {
-        // Cegah input minus
-        if (e.target.value < 1) e.target.value = 1; 
-        hitungTotalTransaksi();
-    }
-});
-
-// Fungsi hitung kembalian (Khusus Tunai)
 function hitungKembalian() {
-    const inputBayar = document.querySelector('.detail-input'); // Class input nominal bayarmu
+    const inputBayar = document.querySelector('.detail-input');
     const elmTotal = document.querySelector('.total-amount');
     const elmKembalian = document.querySelector('.kembalian-amount');
 
@@ -68,8 +60,114 @@ function hitungKembalian() {
     }
 }
 
-// Pasang event listener ke input bayar tunai
-const inputBayar = document.querySelector('.detail-input');
-if (inputBayar) {
-    inputBayar.addEventListener('input', hitungKembalian);
-}
+
+//EVENT LISTENER (Interaksi UI)
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Hitung otomatis saat Qty/Bayar diketik ---
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('qty-input')) {
+            if (e.target.value < 1) e.target.value = 1; 
+            hitungTotalTransaksi();
+        }
+        if (e.target.classList.contains('detail-input')) {
+            hitungKembalian();
+        }
+    });
+
+    // --- Tombol Hapus Baris (Tong Sampah) ---
+    const tableBody = document.querySelector('.table-body');
+    if (tableBody) {
+        tableBody.addEventListener('click', function(e) {
+            const btnDelete = e.target.closest('.btn-delete');
+            if (btnDelete) {
+                btnDelete.closest('.table-row').remove();
+                hitungTotalTransaksi();
+            }
+        });
+    }
+
+    // --- Tombol Kosongkan ---
+    const btnClear = document.querySelector('.btn-clear');
+    if (btnClear && tableBody) {
+        btnClear.addEventListener('click', function() {
+            if(confirm('Yakin ingin membatalkan semua transaksi di keranjang?')) {
+                tableBody.innerHTML = '';
+                hitungTotalTransaksi();
+            }
+        });
+    }
+
+    // --- Toggle Metode Pembayaran ---
+    const methodBtns = document.querySelectorAll('.method-btn');
+    const paymentDetail = document.querySelector('.payment-detail');
+    
+    methodBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Pindahkan class active
+            methodBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Logika UI: Sembunyikan input uang jika bukan TUNAI
+            if (this.innerText.includes('TUNAI')) {
+                paymentDetail.style.display = 'block';
+                hitungKembalian();
+            } else {
+                paymentDetail.style.display = 'none';
+            }
+        });
+    });
+
+    // --- Tombol Cari / Scan ---
+    const btnSearch = document.querySelector('.btn-action-search');
+    const inputSearch = document.querySelector('.search-input');
+    
+    function eksekusiPencarian() {
+        const keyword = inputSearch.value.trim();
+        if (keyword !== '') {
+            // Nanti ini diganti dengan AJAX ke PHP Backend
+            alert('Sistem akan mencari barang: ' + keyword);
+            inputSearch.value = ''; // Kosongkan setelah cari
+        }
+    }
+
+    if (btnSearch) btnSearch.addEventListener('click', eksekusiPencarian);
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') eksekusiPencarian();
+        });
+    }
+
+    // --- Tombol Selesaikan Transaksi ---
+    const btnCheckout = document.querySelector('.btn-checkout');
+    if (btnCheckout) {
+        btnCheckout.addEventListener('click', function() {
+            const total = parseRupiah(document.querySelector('.total-amount').innerText);
+            
+            if (total === 0) {
+                alert('Keranjang kosong! Tidak ada yang bisa di-checkout.');
+                return;
+            }
+
+            // Validasi khusus Tunai
+            const isTunai = document.querySelector('.method-btn.active').innerText.includes('TUNAI');
+            if (isTunai) {
+                const bayar = parseRupiah(document.querySelector('.detail-input').value);
+                if (bayar < total) {
+                    alert('GAGAL: Nominal uang pelanggan kurang dari total tagihan!');
+                    return;
+                }
+            }
+
+            // Simulasi sukses
+            alert('Transaksi Berhasil! Data akan disimpan ke Database.');
+            tableBody.innerHTML = ''; // Bersihkan keranjang
+            if (document.querySelector('.detail-input')) document.querySelector('.detail-input').value = '';
+            hitungTotalTransaksi();
+        });
+    }
+    
+    // Inisialisasi awal
+    hitungTotalTransaksi();
+});
