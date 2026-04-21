@@ -19,6 +19,10 @@ $page_title = isset($page_title) ? $page_title : 'Dashboard Owner';
   <script src="<?= BASE_URL ?>/assets/js/chart.min.js"></script>
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css" />
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/owner.css"/>
+  backend-rofik
+  <link rel="stylesheet" href="../../assets/css/owner.css">
+=======
+>>>> main
   
   <script src="<?= BASE_URL ?>/assets/js/lucide.min.js"></script>
   <script src="<?= BASE_URL ?>/assets/js/chart.min.js"></script>
