@@ -67,7 +67,7 @@
 
 html, body {
   height: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
   transition: background 0.3s, color 0.3s;
@@ -102,7 +102,7 @@ html, body {
   padding: 0 8px;
 }
 .logo-text {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.5px;
@@ -163,7 +163,7 @@ html, body {
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 13px;
   display: flex; align-items: center; justify-content: center;
@@ -249,7 +249,7 @@ html, body {
 }
 .topbar-left { display: flex; flex-direction: column; gap: 2px; }
 .page-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
@@ -337,7 +337,7 @@ html, body {
 .kpi-icon.danger { background: var(--danger-subtle); color: var(--danger); }
 
 .kpi-value {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: var(--text-primary);
@@ -413,7 +413,7 @@ html, body {
   margin-bottom: 16px;
 }
 .chart-card-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
@@ -437,7 +437,7 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 .table-section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
@@ -480,9 +480,9 @@ html, body {
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: rgba(79,123,255,0.04); }
 
-.td-time { font-family: 'DM Mono', monospace; font-size: 12px; }
+.td-time { font-family: 'Inter', sans-serif; font-size: 12px; }
 .td-kasir { font-weight: 500; color: var(--text-primary); }
-.td-nominal { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--text-primary); }
+.td-nominal { font-family: 'Inter', sans-serif; font-weight: 500; color: var(--text-primary); }
 
 .badge {
   display: inline-flex;
