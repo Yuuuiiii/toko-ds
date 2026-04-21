@@ -502,3 +502,84 @@ html, body {
 .page-content::-webkit-scrollbar { width: 4px; }
 .page-content::-webkit-scrollbar-track { background: transparent; }
 .page-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+STYLING HALAMAN SUPPLIER 
+
+.container-supplier h2 { 
+    color: #2c3e50; 
+    font-size: 20px; 
+    margin-bottom: 5px; 
+    margin-left: 25px; 
+}
+
+.container-supplier h2 { color: #2c3e50; font-size: 24px; margin-bottom: 5px; }
+.container-supplier p { color: #7f8c8d; margin-bottom: 20px; }
+
+/* Kotak Form & Tabel */
+.form-section, .table-section {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border: 1px solid #eee;
+}
+
+.form-section h3, .table-section h3 {
+    color: #34495e; border-bottom: 2px solid #3498db; margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; display: inline-block;
+}
+
+/* Form Input */
+.form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+.form-group label { font-weight: bold; margin-bottom: 8px; color: #2c3e50; font-size: 14px; }
+.form-group input, .form-group textarea {
+    background: #ffffff; color: #333; padding: 12px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 14px; transition: all 0.3s ease;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: #3498db; outline: none; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); }
+
+/* Tombol */
+.btn-submit { background-color: #3498db; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+.btn-submit:hover { background-color: #2980b9; }
+
+/* Tabel */
+.table-section table { width: 100%; border-collapse: collapse; }
+.table-section th, .table-section td { padding: 15px 12px; border-bottom: 1px solid #f1f2f6; text-align: left; }
+.table-section th { background-color: #f8f9fa; color: #2c3e50; font-weight: bold; }
+.table-section tr:hover { background-color: #fdfdfd; }
+
+.btn-edit { background-color: #f1c40f; color: #111; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-weight: bold; }
+.btn-delete { background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-edit:hover { background-color: #f39c12; }
+.btn-delete:hover { background-color: #c0392b; }
+
+[data-theme="dark"] .container-supplier { color: #e2e8f0; }
+[data-theme="dark"] .container-supplier h2 { color: #ffffff; }
+[data-theme="dark"] .container-supplier p { color: #94a3b8; }
+
+[data-theme="dark"] .form-section, 
+[data-theme="dark"] .table-section {
+    background: #1e212b; 
+    border-color: #334155; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .form-section h3, 
+[data-theme="dark"] .table-section h3 { color: #f8fafc; }
+[data-theme="dark"] .form-group label { color: #cbd5e1; }
+
+[data-theme="dark"] .form-group input, 
+[data-theme="dark"] .form-group textarea {
+    background: #0f172a; 
+    color: #f8fafc; 
+    border-color: #334155;
+}
+[data-theme="dark"] .form-group input:focus, 
+[data-theme="dark"] .form-group textarea:focus {
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+}
+
+[data-theme="dark"] .table-section th, 
+[data-theme="dark"] .table-section td { border-bottom-color: #334155; }
+[data-theme="dark"] .table-section th { background-color: #0f172a; color: #f8fafc; }
+[data-theme="dark"] .table-section td { color: #cbd5e1; }
+[data-theme="dark"] .table-section tr:hover { background-color: #272f40; }
