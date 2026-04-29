@@ -226,8 +226,10 @@ async function prosesCheckout() {
     }
 
     let idKasir = 2; let namaKasir = 'Kasir';
-    const jwtData = typeof parseJwt === "function" ? parseJwt(getAuthToken()) : null;
-    if (jwtData) { idKasir = jwtData.id || jwtData.ID_Pengguna; namaKasir = jwtData.username; }
+    try {
+        const jwtData = typeof parseJwt === "function" ? parseJwt(getAuthToken()) : null;
+        if (jwtData) { idKasir = jwtData.id || jwtData.ID_Pengguna || 2; namaKasir = jwtData.username || 'Kasir'; }
+    } catch(e) {}
 
     const payload = {
         ID_Kasir: idKasir,
@@ -235,28 +237,53 @@ async function prosesCheckout() {
         Total_Harga: grandTotal,
         Total_Diskon: totalDiskonAmount,
         Metode_Pembayaran: metodeBayar,
-        Items: cart.map(item => ({ SKU_Barang: item.sku, Jumlah_Jual: item.qty, ID_Satuan_Jual: item.id_satuan, Harga_Saat_Jual: item.harga }))
+        Items: cart.map(item => ({ 
+            SKU_Barang: item.sku, 
+            Jumlah_Jual: item.qty, 
+            // JURUS SAKTI: Jika id_satuan kosong/undefined, paksa kirim angka 1 (Pcs) agar PHP tidak panik!
+            ID_Satuan_Jual: item.id_satuan || 1, 
+            Harga_Saat_Jual: item.harga 
+        }))
     };
 
     const btnCheckout = document.querySelector('.btn-checkout');
     btnCheckout.innerHTML = 'MEMPROSES...'; btnCheckout.disabled = true;
 
     try {
-        const response = await fetch(API_URL_TRANSAKSI, { method: 'POST', headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await response.json();
+        const response = await fetch(API_URL_TRANSAKSI, { 
+            method: 'POST', 
+            headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(payload) 
+        });
+        
+        // KITA TANGKAP TEKS MENTAH DARI SERVER!
+        const textRaw = await response.text(); 
+        
+        try {
+            // Coba terjemahkan teks mentah jadi JSON
+            const data = JSON.parse(textRaw);
 
-        if (data.status === 'success') {
-            const waktuSekarang = new Date().toLocaleString('id-ID');
-            const idTrxAsli = data.data.ID_Penjualan ? `TRX-${String(data.data.ID_Penjualan).padStart(4,'0')}` : 'TRX-BARU';
-            
-            generateStrukHTML(cart, (grandTotal + totalDiskonAmount), totalDiskonAmount, grandTotal, bayar, kembalian, metodeBayar, waktuSekarang, idTrxAsli, namaKasir, currentMember ? currentMember.Nama_Pelanggan : null);
-            
-            if(document.getElementById('modalSukses')) document.getElementById('modalSukses').style.display = 'flex';
-            else alert('TRANSAKSI BERHASIL!');
-            
-        } else { alert('GAGAL CHECKOUT: ' + data.message); }
-    } catch (error) { alert('Terjadi kesalahan jaringan.'); } 
-    finally { btnCheckout.innerHTML = 'SELESAIKAN TRANSAKSI'; btnCheckout.disabled = false; }
+            if (data.status === 'success') {
+                const waktuSekarang = new Date().toLocaleString('id-ID');
+                const idTrxAsli = data.data && data.data.ID_Penjualan ? `TRX-${String(data.data.ID_Penjualan).padStart(4,'0')}` : 'TRX-BARU';
+                
+                generateStrukHTML(cart, (grandTotal + totalDiskonAmount), totalDiskonAmount, grandTotal, bayar, kembalian, metodeBayar, waktuSekarang, idTrxAsli, namaKasir, currentMember ? currentMember.Nama_Pelanggan : null);
+                
+                if(document.getElementById('modalSukses')) document.getElementById('modalSukses').style.display = 'flex';
+                else alert('TRANSAKSI BERHASIL!');
+                
+            } else { alert('GAGAL CHECKOUT: ' + data.message); }
+        } catch (jsonError) {
+            // INI DIA! Kalau PHP error, dia akan masuk ke sini dan munculin omelan PHP-nya ke layar!
+            alert('💥 ERROR DARI PHP:\\n' + textRaw);
+            console.error("RAW PHP ERROR:", textRaw);
+        }
+    } catch (error) { 
+        alert('Error Fetch Javascript: ' + error.message); 
+        console.error("Fetch Error:", error);
+    } finally { 
+        btnCheckout.innerHTML = 'SELESAIKAN TRANSAKSI'; btnCheckout.disabled = false; 
+    }
 }
 
 // ==========================================
