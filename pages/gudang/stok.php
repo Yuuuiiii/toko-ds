@@ -1,7 +1,7 @@
 <?php
 $page_title = "Manajemen Stok";
 $current_page = "stok"; 
-require_once '../../includes/header_owner.php';
+require_once '../../includes/header_gudang.php';
 ?>
 
 <style>

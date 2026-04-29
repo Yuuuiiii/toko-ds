@@ -1,13 +1,12 @@
 <?php
-// includes/header_owner.php
-require_once __DIR__ . '/config.php';
+// MATIKAN CACHE BROWSER SECARA PAKSA!
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: 0"); // Masa kedaluwarsa 0 detik
 
-// Bypass Auth untuk fase UI
-$owner_nama = "Siti Nurhaliza";
-$current_page = basename($_SERVER['PHP_SELF'], '.php');
-
-// Judul dinamis
-$page_title = isset($page_title) ? $page_title : 'Dashboard Owner';
+$page_title = $page_title ?? 'Dashboard';
+$current_page = $current_page ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
@@ -15,13 +14,180 @@ $page_title = isset($page_title) ? $page_title : 'Dashboard Owner';
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><?= htmlspecialchars($page_title) ?> — Toko DS</title>
-  <script src="<?= BASE_URL ?>/assets/js/lucide.min.js"></script>
-  <script src="<?= BASE_URL ?>/assets/js/chart.min.js"></script>
-  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css" />
-  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/owner.css"/>
+  <link rel="icon" type="image/webp" href="../../assets/img/logo.webp">
+  <script>
+    // 1. Cek keberadaan token & Ranjau BFCache (Tombol Back)
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+        window.location.replace('../../index.php');
+    }
+
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || !localStorage.getItem('jwt_token')) {
+            if (!localStorage.getItem('jwt_token')) {
+                document.body.style.display = 'none'; 
+                window.location.replace('../../index.php');
+            }
+        }
+    });
+
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+        } catch(e) { return null; }
+    }
+
+    const userData = parseJwt(token);
+    if (!userData || (userData.exp * 1000) < Date.now() || userData.role.toLowerCase() !== 'admin') {
+        alert('Akses Ditolak! Sesi berakhir atau Anda bukan Admin.');
+        localStorage.removeItem('jwt_token');
+        window.location.replace('../../index.php');
+    }
+
+    // ==========================================
+    // LOGIKA TEMA (DARK/LIGHT)
+    // ==========================================
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'light') document.body.classList.add('light-mode');
+        else document.body.classList.remove('light-mode');
+        updateThemeIcon(theme === 'light');
+    }
+
+    function updateThemeIcon(isLight) {
+        const btn = document.getElementById('btnThemeToggleHeader');
+        if (btn) {
+            btn.innerHTML = `<i data-lucide="${isLight ? 'moon' : 'sun'}" style="width: 22px; height: 22px;"></i>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    function toggleThemeHeader() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('saved_theme', newTheme);
+        applyTheme(newTheme);
+    }
+
+    // ==========================================
+    // LOGIKA NOTIFIKASI REAL-TIME
+    // ==========================================
+    async function loadNotifications() {
+        const badge = document.getElementById('notifBadge');
+        const list = document.getElementById('notifList');
+
+        try {
+            const response = await fetch('../../api/notifikasi.php', { 
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+
+            const res = await response.json();
+            
+            if (res.status === 'success') {
+                if (res.unread > 0) {
+                    badge.innerText = res.unread;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                list.innerHTML = '';
+                if (res.data.length === 0) {
+                    list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;">Belum ada notifikasi stok.</div>';
+                } else {
+                    res.data.forEach(notif => {
+                        let color = '#f59e0b'; 
+                        if (notif.Status_Stok === 'HABIS') color = '#ef4444'; 
+                        
+                        list.innerHTML += `
+                            <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: start; background: ${notif.Is_Read === 0 ? 'rgba(67, 97, 238, 0.05)' : 'transparent'};">
+                                <div style="background: ${color}20; color: ${color}; padding: 8px; border-radius: 8px;">
+                                    <i data-lucide="package-minus" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${notif.Nama_Barang}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">Sisa stok saat ini: <strong style="color: ${color};">${notif.Jumlah_Stok}</strong> (${notif.Status_Stok})</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">${new Date(notif.Tanggal_Notifikasi).toLocaleString('id-ID')}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            } else {
+                list.innerHTML = `<div style="padding: 20px; text-align: center; color: #ef4444; font-size: 13px;"><b>Gagal:</b> ${res.message}</div>`;
+            }
+        } catch (error) { 
+            console.error('Error load notifikasi:', error); 
+            list.innerHTML = `<div style="padding: 20px; text-align: center; color: #ef4444; font-size: 13px;"><b>Error Sistem:</b> Gagal menghubungi API. Silakan cek Inspect > Console.</div>`;
+        }
+    }
+
+    async function markAsRead() {
+        try {
+            await fetch('../../api/notifikasi.php', { method: 'POST' });
+            loadNotifications(); 
+        } catch (error) { console.error('Error:', error); }
+    }
+
+    function toggleNotifDropdown() {
+        const dropdown = document.getElementById('notifDropdown');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'block';
+            markAsRead(); 
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('saved_theme') || 'dark';
+        applyTheme(savedTheme);
+        loadNotifications();
+        
+        document.addEventListener('click', function(event) {
+            const btn = document.getElementById('btnNotifWrapper');
+            const dropdown = document.getElementById('notifDropdown');
+            if (btn && dropdown && !btn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // ==========================================
+        // LOGIKA LOGOUT GLOBAL
+        // ==========================================
+        document.getElementById('btn-logout')?.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            if(confirm('Yakin ingin mengakhiri sesi dan keluar?')) {
+                localStorage.removeItem('jwt_token'); 
+                window.location.replace('../../index.php'); 
+            }
+        });
+    });
+  </script>
+
+  <script src="../../assets/js/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
   
-  <script src="<?= BASE_URL ?>/assets/js/lucide.min.js"></script>
-  <script src="<?= BASE_URL ?>/assets/js/chart.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/global.css" />
+  <link rel="stylesheet" href="../../assets/css/owner.css"/>
+
+  <style>
+      .topbar-right { display: flex; align-items: center; gap: 16px; }
+      .top-action-btn { background: transparent; border: none; color: var(--text-secondary, #94a3b8); cursor: pointer; transition: all 0.2s ease; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+      .top-action-btn:hover { color: white !important; background: rgba(255, 255, 255, 0.08); transform: scale(1.05); }
+
+      #btn-logout { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: var(--text-secondary); }
+      #btn-logout:hover { background-color: rgba(239, 68, 68, 0.1) !important; color: #ef4444 !important; border-color: #ef4444 !important; }
+      #btn-logout:hover .logout-icon { color: #ef4444 !important; }
+  </style>
 </head>
 <body>
 
@@ -34,36 +200,56 @@ $page_title = isset($page_title) ? $page_title : 'Dashboard Owner';
       </div>
 
       <nav class="sidebar-nav">
-        <a href="<?= BASE_URL ?>/pages/owner/dashboard.php" class="nav-item <?= $current_page === 'dashboard' ? 'active' : '' ?>">
+        <a href="dashboard.php" class="nav-item <?= $current_page === 'dashboard' ? 'active' : '' ?>">
           <i data-lucide="layout-dashboard"></i>
-          <span>Dashboard</span>
+          <span>Dashboard Utama</span>
         </a>
-        <a href="<?= BASE_URL ?>/pages/owner/stok.php" class="nav-item <?= $current_page === 'stok' ? 'active' : '' ?>">
+        <a href="stok.php" class="nav-item <?= $current_page === 'stok' ? 'active' : '' ?>">
           <i data-lucide="package"></i>
-          <span>Manajemen Stok</span>
+          <span>Kelola Stok & Barang</span>
         </a>
-        <a href="<?= BASE_URL ?>/pages/owner/laporan.php" class="nav-item <?= $current_page === 'laporan' ? 'active' : '' ?>">
-          <i data-lucide="chart-column"></i>
-          <span>Riwayat Keuangan</span>
+        <a href="riwayat_inbound.php" class="nav-item <?= $current_page === 'riwayat_inbound' ? 'active' : '' ?>">
+          <i data-lucide="history"></i> <span>Riwayat Masuk</span>
+        </a>
+        <a href="kategori.php" class="nav-item <?= $current_page === 'kategori' ? 'active' : '' ?>">
+          <i data-lucide="tags"></i> <span>Kategori Barang</span>
+        </a>
+        <a href="supplier.php" class="nav-item <?= $current_page === 'supplier' ? 'active' : '' ?>">
+          <i data-lucide="truck"></i> <span>Data Supplier</span>
+        </a>
+        <a href="pelanggan.php" class="nav-item <?= $current_page === 'pelanggan' ? 'active' : '' ?>">
+            <i data-lucide="users"></i>
+            <span>Data Pelanggan</span>
+        </a>
+
+        <hr></hr>
+        
+        <a href="laporan.php" class="nav-item <?= $current_page === 'laporan' ? 'active' : '' ?>">
+          <i data-lucide="file-spreadsheet"></i>
+          <span>Laporan Keuangan</span>
+        </a>
+         <a href="pengguna.php" class="nav-item <?= $current_page === 'pengguna' ? 'active' : '' ?>">
+          <i data-lucide="user-cog"></i>
+          <span>Kelola Pengguna</span>
         </a>
       </nav>
     </div>
 
     <div class="sidebar-bottom">
       <div class="owner-profile">
-        <div class="owner-avatar"><?= strtoupper(substr($owner_nama, 0, 1)) ?></div>
+        <div class="owner-avatar" id="ownerAvatar">?</div>
         <div class="owner-meta">
-          <span class="owner-role">Owner</span>
-          <span class="owner-name"><?= htmlspecialchars($owner_nama) ?></span>
+          <span class="owner-role" id="ownerRole">Admin</span>
+          <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);" id="ownerName">Memuat...</span>
         </div>
-        <button class="btn-theme-toggle-side" onclick="toggleTheme()">
-          <i data-lucide="sun" id="theme-icon"></i>
-        </button>
       </div>
-      <a href="<?= BASE_URL ?>/index.php" class="btn-logout" onclick="return confirm('Yakin ingin logout?')">
-        <i data-lucide="log-out"></i>
-        <span>Log Out</span>
-      </a>
+      
+      <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: auto;">
+          <a href="#" id="btn-logout">
+              <i data-lucide="log-out" class="logout-icon" style="width: 18px; height: 18px;"></i>
+              <span style="font-size: 14px; font-weight: 600;">Log Out</span>
+          </a>
+      </div>
     </div>
   </aside>
 
@@ -71,83 +257,29 @@ $page_title = isset($page_title) ? $page_title : 'Dashboard Owner';
     <div class="topbar">
       <div class="topbar-left">
         <h1 class="page-title"><?= htmlspecialchars($page_title) ?></h1>
-        <span class="page-date" id="page-date"></span>
       </div>
+      
       <div class="topbar-right">
-<div class="notification-wrapper" style="position: relative;">
-    
-    <button id="btnNotifToggle" style="background: transparent; border: 1px solid var(--border); padding: 8px; border-radius: 8px; cursor: pointer; color: var(--text-secondary); position: relative; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
-        <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
-        <span style="position: absolute; top: -4px; right: -4px; background: var(--danger); color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; border: 2px solid var(--bg-surface);">3</span>
-    </button>
+          
+          <div style="position: relative;" id="btnNotifWrapper">
+              <button id="btnNotif" class="top-action-btn" title="Notifikasi Stok" onclick="toggleNotifDropdown()" style="position: relative;">
+                  <i data-lucide="bell" style="width: 22px; height: 22px;"></i>
+                  <span id="notifBadge" style="display: none; position: absolute; top: 0px; right: 2px; background: #ef4444; color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 20px; border: 2px solid var(--bg-body); align-items: center; justify-content: center;">0</span>
+              </button>
 
-    <div id="dropdownNotif" style="display: none; position: absolute; top: 120%; right: 0; width: 320px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); z-index: 999; overflow: hidden;">
-        
-        <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
-            <h4 style="margin: 0; font-size: 14px; color: var(--text-primary); font-weight: 700;">Notifikasi</h4>
-            <span style="font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 600;">Tandai dibaca</span>
-        </div>
-        
-        <div style="max-height: 300px; overflow-y: auto;">
-            
-            <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.2s;">
-                <div style="width: 8px; height: 8px; background: var(--danger); border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
-                <div>
-                    <p style="margin: 0 0 4px 0; font-size: 13px; color: var(--text-primary); font-weight: 600;">Stok Menipis!</p>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4;">Beras Ramos 5kg tersisa 2 unit. Segera lakukan restock.</p>
-                    <span style="font-size: 11px; color: var(--text-muted); margin-top: 6px; display: block;">10 menit yang lalu</span>
-                </div>
-            </div>
+              <div id="notifDropdown" style="display: none; position: absolute; top: 50px; right: 0; width: 320px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden;">
+                  <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+                      <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">Notifikasi Stok</div>
+                      <a href="stok.php" style="font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 600;">Lihat Stok</a>
+                  </div>
+                  <div id="notifList" style="max-height: 300px; overflow-y: auto;">
+                      <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;">Memuat data...</div>
+                  </div>
+              </div>
+          </div>
 
-            <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; cursor: pointer; transition: 0.2s;">
-                <div style="width: 8px; height: 8px; background: transparent; border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
-                <div>
-                    <p style="margin: 0 0 4px 0; font-size: 13px; color: var(--text-primary); font-weight: 600;">Nanti ini notif disesuaikan dengan yang ada di BE, dan notif juga ada di dashboard</p>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4;">Nandika Aditia telah mengakhiri shift. Selisih kas: Rp 0.</p>
-                    <span style="font-size: 11px; color: var(--text-muted); margin-top: 6px; display: block;">1 jam yang lalu</span>
-                </div>
-            </div>
-
-        </div>
-        
-        <div style="padding: 12px; text-align: center; border-top: 1px solid var(--border); cursor: pointer; background: rgba(255,255,255,0.01);">
-            <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Lihat Semua Aktivitas</span>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const btnToggle = document.getElementById('btnNotifToggle');
-    const dropdown = document.getElementById('dropdownNotif');
-
-    if (btnToggle && dropdown) {
-        // Klik lonceng untuk buka/tutup
-        btnToggle.addEventListener('click', function(e) {
-            e.stopPropagation(); // Cegah event bocor ke document
-            const isVisible = dropdown.style.display === 'block';
-            dropdown.style.display = isVisible ? 'none' : 'block';
-            
-            // Ubah warna ikon saat aktif
-            if (!isVisible) {
-                btnToggle.style.background = 'rgba(255,255,255,0.05)';
-                btnToggle.style.color = 'var(--text-primary)';
-            } else {
-                btnToggle.style.background = 'transparent';
-                btnToggle.style.color = 'var(--text-secondary)';
-            }
-        });
-
-        // Klik di luar area untuk menutup
-        document.addEventListener('click', function(e) {
-            if (!dropdown.contains(e.target) && e.target !== btnToggle) {
-                dropdown.style.display = 'none';
-                btnToggle.style.background = 'transparent';
-                btnToggle.style.color = 'var(--text-secondary)';
-            }
-        });
-    }
-});
-</script>
+          <button id="btnThemeToggleHeader" class="top-action-btn" title="Ubah Tema" onclick="toggleThemeHeader()">
+              <i data-lucide="sun" style="width: 22px; height: 22px;"></i>
+          </button>
       </div>
     </div>

@@ -593,7 +593,7 @@ html, body {
     background: rgba(34, 200, 122, 0.08); 
     border: 1.5px solid var(--success);
     border-radius: var(--radius-sm);
-    margin-bottom: 24px;
+    margin-bottom: 8px;
 }
 
 .kembalian-label {
