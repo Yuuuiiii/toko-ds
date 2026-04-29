@@ -174,8 +174,7 @@ $current_page = $current_page ?? '';
   </script>
 
   <script src="../../assets/js/lucide.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>   
   <link rel="stylesheet" href="../../assets/css/global.css" />
   <link rel="stylesheet" href="../../assets/css/owner.css"/>
 
